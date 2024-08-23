@@ -2,15 +2,13 @@ import 'package:json_annotation/json_annotation.dart';
 
 @JsonSerializable()
 class Lyrics {
-  final String lyrics;
+  final String? lyrics;
 
-  Lyrics({required this.lyrics});
-
+  Lyrics({this.lyrics});
 
   factory Lyrics.fromJson(Map<String, dynamic> json) {
     return _$LyricsFromJson(json);
   }
-
 
   Map<String, dynamic> toJson() => _$LyricsToJson(this);
 }

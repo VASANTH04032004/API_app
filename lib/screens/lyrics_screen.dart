@@ -36,16 +36,18 @@ class LyricsScreenState extends State<LyricsScreen> {
           } else if (snapshot.hasData) {
             final lyricsData = snapshot.data!.data;
 
-            if (lyricsData != null && lyricsData.lyrics.isNotEmpty) {
+            if (lyricsData != null && (lyricsData.lyrics?.isNotEmpty ?? false)) {
               return SingleChildScrollView(
                 padding: const EdgeInsets.all(16.0),
                 child: Text(
-                  lyricsData.lyrics,
+                  lyricsData.lyrics ?? 'No lyrics available.',
                   style: const TextStyle(fontSize: 16.0),
                 ),
               );
             } else {
-              return Center(child: Text('No lyrics found for ${widget.artist} - ${widget.title}.'));
+              return Center(
+                child: Text('No lyrics found for ${widget.artist} - ${widget.title}.'),
+              );
             }
           } else {
             return Center(child: Text('Unexpected error occurred.'));

@@ -3,8 +3,8 @@ import 'package:http/http.dart' as http;
 import '../models/ sunrise_sunset_model.dart';
 import '../models/lyrics_model.dart';
 
-class Resource<T> {
-  final T? data;
+class Resource<Item> {
+  final Item? data;
   final String? error;
 
   Resource.success(this.data) : error = null;
@@ -19,10 +19,17 @@ class ApiService {
       if (response.statusCode == 200) {
         return Resource.success(json.decode(response.body));
       } else {
-        return Resource.failure('Failed to load data');
+        return Resource.failure(
+            'Error: ${response.statusCode} ${response.reasonPhrase}');
       }
+    } on http.ClientException catch (e) {
+      return Resource.failure('ClientException: ${e.message}');
+    } on FormatException catch (e) {
+      return Resource.failure('FormatException: ${e.message}');
+    } on Exception catch (e) {
+      return Resource.failure('Exception: ${e.toString()}');
     } catch (e) {
-      return Resource.failure(e.toString());
+      return Resource.failure('Unknown error: ${e.toString()}');
     }
   }
 }
@@ -31,17 +38,21 @@ class LyricsService {
   final ApiService _apiService = ApiService();
 
   Future<Resource<Lyrics>> fetchLyrics(String artist, String title) async {
-    final url = 'https://api.lyrics.ovh/v1/$artist/$title';
-    final result = await _apiService.get(url);
+    try {
+      final url = 'https://api.lyrics.ovh/v1/$artist/$title';
+      final result = await _apiService.get(url);
 
-    if (result.data != null) {
-      try {
+      if (result.data != null) {
         return Resource.success(Lyrics.fromJson(result.data!));
-      } catch (e) {
-        return Resource.failure('Failed to parse lyrics');
+      } else {
+        return Resource.failure(result.error ?? 'Unknown error occurred');
       }
-    } else {
-      return Resource.failure(result.error!);
+    } on FormatException catch (e) {
+      return Resource.failure('FormatException: ${e.message}');
+    } on Exception catch (e) {
+      return Resource.failure('Exception: ${e.toString()}');
+    } catch (e) {
+      return Resource.failure('Unknown error: ${e.toString()}');
     }
   }
 }
@@ -50,17 +61,21 @@ class SunriseSunsetService {
   final ApiService _apiService = ApiService();
 
   Future<Resource<SunriseSunset>> fetchSunriseSunset(double lat, double lng) async {
-    final url = 'https://api.sunrise-sunset.org/json?lat=$lat&lng=$lng';
-    final result = await _apiService.get(url);
+    try {
+      final url = 'https://api.sunrise-sunset.org/json?lat=$lat&lng=$lng';
+      final result = await _apiService.get(url);
 
-    if (result.data != null) {
-      try {
+      if (result.data != null) {
         return Resource.success(SunriseSunset.fromJson(result.data!));
-      } catch (e) {
-        return Resource.failure('Failed to parse sunrise/sunset data');
+      } else {
+        return Resource.failure(result.error ?? 'Unknown error occurred');
       }
-    } else {
-      return Resource.failure(result.error!);
+    } on FormatException catch (e) {
+      return Resource.failure('FormatException: ${e.message}');
+    } on Exception catch (e) {
+      return Resource.failure('Exception: ${e.toString()}');
+    } catch (e) {
+      return Resource.failure('Unknown error: ${e.toString()}');
     }
   }
 }

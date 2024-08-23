@@ -32,48 +32,38 @@ class _LyricsInputScreenState extends State<LyricsInputScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Enter Lyrics Details')),
-      body: Column(
-        children: [
-          // Padding around the top part
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: _artistController,
-                    decoration: InputDecoration(
-                      labelText: 'Artist',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  TextField(
-                    controller: _titleController,
-                    decoration: InputDecoration(
-                      labelText: 'Title',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ],
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextField(
+              controller: _artistController,
+              decoration: InputDecoration(
+                labelText: 'Artist',
+                border: OutlineInputBorder(),
               ),
             ),
-          ),
-
-          Spacer(),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: TextField(
+                controller: _titleController,
+                decoration: InputDecoration(
+                  labelText: 'Title',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ),
+            Expanded(child: Container()), 
+            ElevatedButton(
               onPressed: _fetchLyrics,
               style: ElevatedButton.styleFrom(
                 minimumSize: Size(double.infinity, 50),
               ),
               child: Text('Get Lyrics'),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
