@@ -26,16 +26,17 @@ class SunriseSunsetScreenState extends State<SunriseSunsetScreen> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError || snapshot.data?.error != null) {
-            return Center(child: Text('Error: ${snapshot.data?.error ?? snapshot.error}'));
-          } else if (snapshot.hasData && snapshot.data?.data != null) {
+          } else if (snapshot.hasError || snapshot.data is Failure) {
+            return Center(child: Text('Error: ${(snapshot.data as Failure).errorMessage ?? snapshot.error.toString()}'));
+          } else if (snapshot.hasData && snapshot.data is Success<SunriseSunset>) {
+            final data = (snapshot.data as Success<SunriseSunset>).data;
             return SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Sunrise: ${snapshot.data!.data!.sunrise}'),
-                  Text('Sunset: ${snapshot.data!.data!.sunset}'),
+                  Text('Sunrise: ${data.sunrise}'),
+                  Text('Sunset: ${data.sunset}'),
                 ],
               ),
             );

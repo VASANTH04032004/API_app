@@ -18,7 +18,6 @@ class LyricsScreenState extends State<LyricsScreen> {
   @override
   void initState() {
     super.initState();
-    // Fetch lyrics using the provided artist and title
     lyrics = LyricsService().fetchLyrics(widget.artist, widget.title);
   }
 
@@ -31,16 +30,15 @@ class LyricsScreenState extends State<LyricsScreen> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError || snapshot.data?.error != null) {
-            return Center(child: Text('Error: ${snapshot.data?.error ?? snapshot.error}'));
-          } else if (snapshot.hasData) {
-            final lyricsData = snapshot.data!.data;
-
-            if (lyricsData != null && (lyricsData.lyrics?.isNotEmpty ?? false)) {
+          } else if (snapshot.hasError || snapshot.data is Failure) {
+            return Center(child: Text('Error: ${(snapshot.data as Failure).errorMessage ?? snapshot.error.toString()}'));
+          } else if (snapshot.hasData && snapshot.data is Success<Lyrics>) {
+            final data = (snapshot.data as Success<Lyrics>).data;
+            if (data.lyrics?.isNotEmpty ?? false) {
               return SingleChildScrollView(
                 padding: const EdgeInsets.all(16.0),
                 child: Text(
-                  lyricsData.lyrics ?? 'No lyrics available.',
+                  data.lyrics ?? 'No lyrics available.',
                   style: const TextStyle(fontSize: 16.0),
                 ),
               );

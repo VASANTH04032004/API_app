@@ -37,24 +37,27 @@ class _LyricsInputScreenState extends State<LyricsInputScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            TextField(
-              controller: _artistController,
-              decoration: InputDecoration(
-                labelText: 'Artist',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 16.0),
-              child: TextField(
-                controller: _titleController,
-                decoration: InputDecoration(
-                  labelText: 'Title',
-                  border: OutlineInputBorder(),
+            Column(
+              children: [
+                TextField(
+                  controller: _artistController,
+                  decoration: InputDecoration(
+                    labelText: 'Artist',
+                    border: OutlineInputBorder(),
+                  ),
                 ),
-              ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: TextField(
+                    controller: _titleController,
+                    decoration: InputDecoration(
+                      labelText: 'Title',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+              ],
             ),
-            Expanded(child: Container()), 
             ElevatedButton(
               onPressed: _fetchLyrics,
               style: ElevatedButton.styleFrom(
@@ -67,4 +70,5 @@ class _LyricsInputScreenState extends State<LyricsInputScreen> {
       ),
     );
   }
+
 }

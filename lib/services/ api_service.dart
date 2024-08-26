@@ -3,33 +3,46 @@ import 'package:http/http.dart' as http;
 import '../models/ sunrise_sunset_model.dart';
 import '../models/lyrics_model.dart';
 
-class Resource<Item> {
-  final Item? data;
-  final String? error;
 
-  Resource.success(this.data) : error = null;
-  Resource.failure(this.error) : data = null;
+abstract class Resource<Item> {}
+
+
+class Success<Item> extends Resource<Item> {
+  final Item data;
+
+  Success(this.data);
+}
+
+
+class Failure<Item> extends Resource<Item> {
+  final String? errorMessage;
+  final Exception? exception;
+  final Error? error;
+
+  Failure({this.errorMessage, this.exception, this.error});
 }
 
 class ApiService {
-  Future<Resource<Map<String, dynamic>>> get(String url) async {
+  Future<Resource<Item>> fetchData<Item>(String url, Item Function(String) fromJson) async {
     try {
       final response = await http.get(Uri.parse(url));
 
-      if (response.statusCode == 200) {
-        return Resource.success(json.decode(response.body));
+      if (response.statusCode < 300) {
+        print("Response: ${response.body}");
+        return Success<Item>(fromJson(json.decode(response.body)));
+      } else if (response.statusCode >= 500) {
+        return Failure(errorMessage: "500: Server Error");
       } else {
-        return Resource.failure(
-            'Error: ${response.statusCode} ${response.reasonPhrase}');
+        return Failure(errorMessage: "Error: ${response.statusCode} ${response.reasonPhrase}");
       }
     } on http.ClientException catch (e) {
-      return Resource.failure('ClientException: ${e.message}');
+      return Failure(errorMessage: 'ClientException: ${e.message}');
     } on FormatException catch (e) {
-      return Resource.failure('FormatException: ${e.message}');
+      return Failure(errorMessage: 'FormatException: ${e.message}');
     } on Exception catch (e) {
-      return Resource.failure('Exception: ${e.toString()}');
+      return Failure(errorMessage: 'Exception: ${e.toString()}');
     } catch (e) {
-      return Resource.failure('Unknown error: ${e.toString()}');
+      return Failure(errorMessage: 'Unknown error: ${e.toString()}');
     }
   }
 }
@@ -38,22 +51,8 @@ class LyricsService {
   final ApiService _apiService = ApiService();
 
   Future<Resource<Lyrics>> fetchLyrics(String artist, String title) async {
-    try {
-      final url = 'https://api.lyrics.ovh/v1/$artist/$title';
-      final result = await _apiService.get(url);
-
-      if (result.data != null) {
-        return Resource.success(Lyrics.fromJson(result.data!));
-      } else {
-        return Resource.failure(result.error ?? 'Unknown error occurred');
-      }
-    } on FormatException catch (e) {
-      return Resource.failure('FormatException: ${e.message}');
-    } on Exception catch (e) {
-      return Resource.failure('Exception: ${e.toString()}');
-    } catch (e) {
-      return Resource.failure('Unknown error: ${e.toString()}');
-    }
+    final url = 'https://api.lyrics.ovh/v1/$artist/$title';
+    return await _apiService.fetchData(url, (body) => Lyrics.fromJson(jsonDecode(body)));
   }
 }
 
@@ -61,21 +60,7 @@ class SunriseSunsetService {
   final ApiService _apiService = ApiService();
 
   Future<Resource<SunriseSunset>> fetchSunriseSunset(double lat, double lng) async {
-    try {
-      final url = 'https://api.sunrise-sunset.org/json?lat=$lat&lng=$lng';
-      final result = await _apiService.get(url);
-
-      if (result.data != null) {
-        return Resource.success(SunriseSunset.fromJson(result.data!));
-      } else {
-        return Resource.failure(result.error ?? 'Unknown error occurred');
-      }
-    } on FormatException catch (e) {
-      return Resource.failure('FormatException: ${e.message}');
-    } on Exception catch (e) {
-      return Resource.failure('Exception: ${e.toString()}');
-    } catch (e) {
-      return Resource.failure('Unknown error: ${e.toString()}');
-    }
+    final url = 'https://api.sunrise-sunset.org/json?lat=$lat&lng=$lng';
+    return await _apiService.fetchData(url, (body) => SunriseSunset.fromJson(jsonDecode(body)));
   }
 }
