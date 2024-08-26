@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/sunrise_sunset_screen.dart';
-import 'screens/lyrics_screen.dart';
+import 'screens/lyrics_input_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -42,7 +42,7 @@ class HomeScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => LyricsScreen()),
+                  MaterialPageRoute(builder: (context) => LyricsInputScreen()),
                 );
               },
               child: Text('Lyrics'),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/ sunrise_sunset_model.dart';
-import '../services/sunrise_sunset_service.dart';
+import '../services/ api_service.dart';
+
 
 class SunriseSunsetScreen extends StatefulWidget {
   @override
@@ -8,7 +9,7 @@ class SunriseSunsetScreen extends StatefulWidget {
 }
 
 class SunriseSunsetScreenState extends State<SunriseSunsetScreen> {
-  late Future<SunriseSunset> sunriseSunset;
+  late Future<Resource<SunriseSunset>> sunriseSunset;
 
   @override
   void initState() {
@@ -20,21 +21,22 @@ class SunriseSunsetScreenState extends State<SunriseSunsetScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Sunrise and Sunset')),
-      body: FutureBuilder<SunriseSunset>(
+      body: FutureBuilder<Resource<SunriseSunset>>(
         future: sunriseSunset,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (snapshot.hasData) {
+          } else if (snapshot.hasError || snapshot.data is Failure) {
+            return Center(child: Text('Error: ${(snapshot.data as Failure).errorMessage ?? snapshot.error.toString()}'));
+          } else if (snapshot.hasData && snapshot.data is Success<SunriseSunset>) {
+            final data = (snapshot.data as Success<SunriseSunset>).data;
             return SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Sunrise: ${snapshot.data!.sunrise}'),
-                  Text('Sunset: ${snapshot.data!.sunset}'),
+                  Text('Sunrise: ${data.sunrise}'),
+                  Text('Sunset: ${data.sunset}'),
                 ],
               ),
             );
