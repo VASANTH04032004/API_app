@@ -2,13 +2,18 @@ import 'package:json_annotation/json_annotation.dart';
 
 @JsonSerializable()
 class SunriseSunset {
-  final String? sunrise;
-  final String? sunset;
+  final String sunrise;
+  final String sunset;
 
-  SunriseSunset({this.sunrise, this.sunset});
+  SunriseSunset({required this.sunrise, required this.sunset});
 
-  factory SunriseSunset.fromJson(Map<String, dynamic> json) =>
-      _$SunriseSunsetFromJson(json);
+  factory SunriseSunset.fromJson(Map<String, dynamic> json) {
+    final results = json['results'] as Map<String, dynamic>;
+    return SunriseSunset(
+      sunrise: results['sunrise'] as String,
+      sunset: results['sunset'] as String,
+    );
+  }
 
   Map<String, dynamic> toJson() => _$SunriseSunsetToJson(this);
 }
@@ -20,9 +25,3 @@ Map<String, dynamic> _$SunriseSunsetToJson(SunriseSunset instance) {
   };
 }
 
-SunriseSunset _$SunriseSunsetFromJson(Map<String, dynamic> json) {
-  return SunriseSunset(
-    sunrise: json['sunrise'] as String?,
-    sunset: json['sunset'] as String?,
-  );
-}
